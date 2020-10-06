@@ -31,6 +31,12 @@ Generally, this means
 1. Install tools that are needed to build your application.
 2. Install dependencies, libraries and packages.
 3. Build your application.
+4. Start your application.
+
+### Your mission
+
+The only file you will need to edit in each phase is the __Dockerfile__.
+Additional edits are purely at your discretion.
 
 ## Before you begin
 
@@ -38,11 +44,11 @@ Prepare yourself to work through a number of **Docker** commands and
 `Dockerfile` instructions using documentation, including cleaning up after 
 yourself when you make mistakes (we all do!). You will be provided with starter
 files including a working application for each phase. This will allow you to 
-focus on the Docker in this project.
+focus on the Dockerfile in each phase of this project.
 
 ### Help and hints
 
-If you are ever need help with Dockerfile commands the Dockerfile
+If you are need help with Dockerfile commands the Dockerfile
 [documentation][docker-docs] is your best friend!
 
 **Remember**: Each command you use in a Dockerfile(`FROM`, `RUN`, `WORKDIR`,
@@ -51,14 +57,14 @@ commands by utilizing `\` at the end of one line to signal that it continues
 on the next line. You can also chain commands using the `&&` symbol, so that 
 later commands won't run unless each earlier ones is successful.
 
-Here is an example of both being used below:
+Here is an example of both being used:
 
 ```docker
  RUN apt-get update \
     && apt-get install --no-install-recommends
 ```
 
-### Clean up
+### Remember to clean up after yourself
 
 Before you start, make sure to stop and remove any containers you have running,
 so they don't interfere with your testing.
@@ -71,12 +77,11 @@ docker volume ls
 docker network ls
 ```
 
-You want to get back to a state that has only the following.
+Your goal is to get back to this state:
 
 * No containers
 * No volumes
 * Three networks (the defaults of `bridge`, `host` and `none`)
-
 
 Clean up as needed with a combination of `stop` and `prune` commands.
 
@@ -87,11 +92,6 @@ docker volume prune -f
 docker network prune -f
 ```
 
-### Your mission
-
-The only file you will need to edit in each phase is the __Dockerfile__.
-Additional edits are purely at your discretion.
-
 ## Phase 1: Static website (HTML served through NGINX)
 
 As you saw in previous lessons, the [`nginx` image on Docker Hub][image-nginx] 
@@ -100,26 +100,30 @@ index.html file. Your goal in this phase is to replace the default
 __index.html__ with a custom one (from the starter or of your own making).
 
 Start the `Dockerfile` as most **Dockerfiles** will start, using the `FROM` 
-instruction. To get the simplest version of nginx, it is recommended that you
-use the latest `alpine` version.
+instruction. To get the simplest version of nginx (so your image is as small as
+possible), it is recommended that you use the latest version on `alpine`.
 
 You'll need to make sure you are copying your html into the correct folder.
 The default root directory for NGINX on Alpine Linux is `/usr/share/nginx/html`.
-In your Docker file, an an instructions to change the working directory to 
+In your Docker file, add an instructions to change the working directory to 
 this path.
 
 The final instruction is to copy in your __index.html__ file. Add that to your
 Dockerfile now.
 
+> Important: The NGINX base image already includes the CMD that will start the
+> web server so you do not need to repeat that in your __Dockerfile__.
+
 Finally, you are ready to build the image! Remember to use a tag; the typical
-format is `<username/imagename>`.
+format of a tag is `<username/imagename>`.
 
 ```bash 
 docker build -t abc/deep-dive-phase-1 .
 ```
 
-Then to run a container from that image with the proper port and name as well as
-using the detached mode.
+To confirm your image is working correctly, you'll need to run a container from
+that image with the proper port. Remember to name your container. Optionally,
+you can run in detached mode.
 
 ```bash 
 docker container run -p 8080:80 --name deep1 -d abc/deep-dive-phase-1
@@ -128,56 +132,63 @@ docker container run -p 8080:80 --name deep1 -d abc/deep-dive-phase-1
 In your browser, go to [http://localhost:8080][local-nginx-url]. If you see 
 the one-page website, then success!
 
-### Wrap-up
+### Save your progress
 
-As you work on projects, you can commit your Dockerfile with all your other 
+As you work on projects, you should commit your Dockerfile with all your other 
 project files.
 
 > Important: Take a moment right now to use Github and commit these files to get
 > those green squares!
 
-Stop running the container and remove it 
-([see above for commands](#before-you-begin), if needed). Then, you are ready to
+Clean up before the next phase by stopping the container and removing it 
+([see above for commands](#before-you-begin), if needed). Now, you are ready to
 move on to phase 2!
 
-## Phase 2: Node/Express app
+## Phase 2: Express app
+
+As you know, **Express** apps run through the **node** engine, so begin by 
+looking for the most appropriate [`node` image on Docker Hub][image-node].
 
 ...
 
-### Wrap-up
+...
 
-> Important: Take a moment right now to use Github and commit these files to get
-> those green squares!
+... Tip: In the end you should be using these commands (in the appropriate order):
+CMD, COPY, EXPOSE, FROM, RUN, WORKDIR ...
 
-Stop running the container and remove it 
-([see above for commands](#before-you-begin), if needed). Then, you are ready to
-move on to phase 3!
+... Load and install packages before applications files for better caching
+since the packages change less frequently than code files ...
 
-## Phase 3: React/Redux app
+Finally, you are ready to build the image! Remember to use a tag; the typical
+format of a tag is `<username/imagename>`.
+
+```bash 
+docker build -t abc/deep-dive-phase-1 .
+```
+
+To confirm your image is working correctly, you'll need to run a container from
+that image with the proper port. Remember to name your container. Optionally,
+you can run in detached mode.
+
+```bash 
+docker container run -p 8080:80 --name deep1 -d abc/deep-dive-phase-1
+```
+
+In your browser, go to [http://localhost:8081][local-express-url]. If 
+**Express** says "Hello", then you successfully created another Dockerfile!
+
+### Save your progress
 
 ...
 
-### Wrap-up
-
-> Important: Take a moment right now to use Github and commit these files to get
-> those green squares!
-
-Stop running the container and remove it 
-([see above for commands](#before-you-begin), if needed). Then, you are ready to
-move on to phase 4!
-
-## Phase 4: Python/Flask app
+## Phase 3: React app
 
 ...
 
-### Wrap-up
+## Phase 4: Python app
 
-> Important: Take a moment right now to use Github and commit these files to get
-> those green squares!
+...
 
-Stop running the container and remove it 
-([see above for commands](#before-you-begin), if needed). Then, you are ready to
-move on to the bonus phases, if you'd like.
 
 ## Bonus Phase A: Health Checks
 
@@ -197,8 +208,10 @@ deployments!
 
 [docker-docs]: https://docs.docker.com/engine/reference/builder/
 [image-nginx]: https://hub.docker.com/_/nginx
-[nginx-alpine]: https://wiki.alpinelinux.org/wiki/Nginx
 [local-nginx-url]: http://localhost:8080
+
+[image-node]: https://hub.docker.com/_/node
+[local-express-url]: http://localhost:8081/
 
 [health]: https://docs.docker.com/engine/reference/builder/#healthcheck
 [kubernetes]: https://kubernetes.io/docs/tutorials/kubernetes-basics/
