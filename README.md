@@ -35,8 +35,9 @@ Generally, this means
 
 ### Your mission
 
-The only file you will need to edit in each phase is the __Dockerfile__.
-Additional edits are purely at your discretion.
+The primary file you will need to edit in each phase is the `Dockerfile`. In
+some phases, you'll also want to create a `.dockerignore` file. Additional edits
+are purely at your discretion.
 
 ## Before you begin
 
@@ -134,7 +135,7 @@ the one-page website, then success!
 
 ### Save your progress
 
-As you work on projects, you should commit your Dockerfile with all your other 
+As you work on projects, you should commit your `Dockerfile` with all your other 
 project files.
 
 > Important: Take a moment right now to use Github and commit these files to get
@@ -149,26 +150,38 @@ move on to phase 2!
 As you know, **Express** apps run through the **node** engine, so begin by 
 looking for the most appropriate [`node` image on Docker Hub][image-node].
 
-...
+Next, familiarize yourself with the application files in the __phase2__ folder.
+In particular, take note of which port the **Express** application will use.
 
-...
+Now, open the `Dockerfile` and follow the notes left by the previous developer.
+These will guide you through each of the instructions you need to add to the 
+`Dockerfile` to successfully build and run the application.
 
-... Tip: In the end you should be using these commands (in the appropriate order):
-CMD, COPY, EXPOSE, FROM, RUN, WORKDIR ...
+### Tips
 
-... Load and install packages before applications files for better caching
-since the packages change less frequently than code files ...
+> Tip 1: In the end you should be using these commands somewhere in the 
+> `Dockerfile`: CMD, COPY, EXPOSE, FROM, RUN, WORKDIR
 
-Finally, you are ready to build the image! Remember to use a tag; the typical
-format of a tag is `<username/imagename>`.
+> Tip 2: Loading and installing packages before copying in applications files 
+> make better use of layer caching since the packages change less often than 
+> code files.
+
+> Tip 3: You can build your image (see below) as you add instructions, and  
+> connect to the container as it runs 
+> (`docker container run -it --rm abc/deep-dive-phase-2 sh`). Then using your 
+> **Alpine Linux** knowledge you can figure out if the process is working as 
+> expected (`ls`, `pwd`, `ps -a`, etc.).
+
+When you are ready, build the image for this phase (remember to replace `abc`
+with your own initials).
 
 ```bash 
-docker build -t abc/deep-dive-phase-1 .
+docker build -t abc/deep-dive-phase-2 .
 ```
 
 To confirm your image is working correctly, you'll need to run a container from
-that image with the proper port. Remember to name your container. Optionally,
-you can run in detached mode.
+that image with the proper port. Remember to name your container, and, if you'd 
+like, you can run in detached mode.
 
 ```bash 
 docker container run -p 8080:80 --name deep1 -d abc/deep-dive-phase-1
@@ -179,16 +192,75 @@ In your browser, go to [http://localhost:8081][local-express-url]. If
 
 ### Save your progress
 
-...
+As you work on projects, you should commit your `Dockerfile` with all your other 
+project files.
+
+> Important: Take a moment right now to use Github and commit these files to get
+> those green squares!
+
+Clean up before the next phase by stopping the container and removing it 
+([see above for commands](#before-you-begin), if needed). Now, you are ready to
+move on to phase 3!
 
 ## Phase 3: React app
 
-...
+For this phase, you'll complete a `Dockerfile` for a React app. Take a look
+through the `phase3` folder. What you'll discover is that this is only frontend;
+there's no webserver to host this application.
 
-## Phase 4: Python app
+So, as you consider which **Docker image** to use as the base, you're presented
+with a small challenge. In order to build the React app, you need `node` as your
+base image, and to make the application available in the browser you need a 
+webserver such as `nginx` for your base image. This means you have two main 
+tasks to do, but you only want one **Docker image** for this application. The 
+good news is that once you do the build, you don't need `node` and more. You can
+take the files that node built and replace the default HTML that `nginx` 
+renders.
 
-...
+To begin, create a `.dockerignore` file and fill it with what you'll want to 
+ignore in your build image (for example, __node_modules__, **Docker** and 
+**git** files, any distribution or build folders).
 
+Next, open the `Dockerfile` and begin to fill in each instruction. Notes have 
+been provided by the previous application developer for each of the steps.
+Select the appropriate base images using **Docker Hub**.
+
+* [`node` base images][image-node]
+* [`nginx` base images][image-nginx]
+
+> Tip 1: When loading a base image using the `FROM` command, you can name it 
+> with `as`. Then when you want to `COPY` files from it, use the `--from` flag.
+> For example:
+> `FROM node as build-stage`
+> `COPY --from=build-stage /app /`
+
+> Tip 2: [Look back](#tips) at the express server tips for an approach to 
+> testing as you work. This can be a real time saver!
+
+Try to remember the `docker build` and `container run` commands on your own.
+If you get stuck, take a look below.
+
+* `docker build -t abc/deep-dive-phase-3 .`
+* `docker container run -p 8082:80 --rm -it abc/deep-dive-phase-3 sh`
+* `docker container run -p 8082:80 --name deep3 -d abc/deep-dive-phase-3`
+
+Once you have your container successfully running (double check with 
+`docker ps -a`), then you can [visit the external port you exposed on 
+localhost][local-react-url].
+Once you are greeted with a "congratulations" message, then you know you did it
+right!
+
+### Save your progress
+
+As you work on projects, you should commit your `Dockerfile` with all your other 
+project files.
+
+> Important: Take a moment right now to use Github and commit these files to get
+> those green squares!
+
+Clean up before the next phase by stopping the container and removing it 
+([see above for commands](#before-you-begin), if needed). Now, you are ready to
+move on to the bonus phases!
 
 ## Bonus Phase A: Health Checks
 
@@ -212,6 +284,7 @@ deployments!
 
 [image-node]: https://hub.docker.com/_/node
 [local-express-url]: http://localhost:8081/
+[local-react-url]: http://localhost:8082/
 
 [health]: https://docs.docker.com/engine/reference/builder/#healthcheck
 [kubernetes]: https://kubernetes.io/docs/tutorials/kubernetes-basics/
